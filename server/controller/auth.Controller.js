@@ -30,5 +30,6 @@ export const register = async (req, res) => {
       success: false,
       message: "Internal server error",
     });
+    // next(error);
   }
 };
