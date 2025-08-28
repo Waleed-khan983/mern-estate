@@ -45,7 +45,7 @@ export const Login = async (req, res) => {
     const existingUser = await userModel.findOne({ email });
 
     if (!existingUser) {
-      return res.status(400).jsin({
+      return res.status(400).json({
         success: false,
         message: "User not found",
       });
@@ -70,6 +70,11 @@ export const Login = async (req, res) => {
           success: true,
           message: "User Login successfully",
           token,
+          user: {
+            id: existingUser._id,
+            email: existingUser.email,
+            name: existingUser.name, // adjust to your schema
+          },
         });
       }
     }

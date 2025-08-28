@@ -3,10 +3,14 @@ import axios from "axios";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useState } from "react";
+import {useDispatch, useSelector} from 'react-redux'
+import {loginStart, loginSuccess, loginFailure} from '../redux/user/user.js'
 
 const Login = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+ 
+  const {loading , error} = useSelector((state) => state.user)
 
   const formik = useFormik({
     initialValues: {
@@ -25,25 +29,23 @@ const Login = () => {
         .required("Password is required"),
     }),
     onSubmit: async (values) => {
-      setLoading(true);
+       // tell redux we are starting
+       dispatch(loginStart())
       try {
         const response = await axios.post(
           "http://localhost:3000/auth/login",
           values
         );
         if (response.data.success) {
-          alert(response.data.message || "User Logged In successfully");
-          navigate("/");
+          dispatch(loginSuccess(response.data.user));
+          console.log(response.data.token)
+           navigate("/");
+        }else{
+          dispatch(loginFailure(response.data.message || "Login failed"))
         }
       } catch (error) {
-        if (error.response) {
-          alert(error.response.data.message || "Login failed");
-        } else {
-          alert("Something went wrong. Please try again later.");
-        }
-      } finally {
-        setLoading(false);
-      }
+         dispatch(loginFailure(error.response?.data?.message || "Something went wrong"))
+      } 
     },
   });
 
