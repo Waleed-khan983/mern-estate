@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { useState } from "react";
 import {useDispatch, useSelector} from 'react-redux'
 import {loginStart, loginSuccess, loginFailure} from '../redux/user/user.js'
+import Oauth from "../components/Oauth.jsx";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -92,6 +93,7 @@ const Login = () => {
         >
           {loading ? "Loading..." : "Login"}
         </button>
+        <Oauth />
       </form>
 
       <div className="flex gap-3 mt-5">

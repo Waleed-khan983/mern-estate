@@ -1,6 +1,9 @@
 import { FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 const Header = () => {
+  const { currentUser } = useSelector((state) => state.user);
+  console.log("Header currentUser:", currentUser);
   return (
     <header className="bg-slate-200 shadow-md  ">
       <div className="flex mx-auto justify-between items-center   p-3">
@@ -20,20 +23,26 @@ const Header = () => {
           <FaSearch className="text-slate-600" />
         </form>
         <ul className="flex gap-4 ">
-            <Link to='/'>
-          <li className="text-slate-700 hidden sm:inline hover:underline hover:text-slate-500 duration-700 transition">
-            Home
-          </li>
-          </Link>
-  
-           <Link to='/about'>
-          <li className="text-slate-700 hidden sm:inline hover:underline hover:text-slate-500 duration-700 transition">
-            About
-          </li>
+          <Link to="/">
+            <li className="text-slate-700 hidden sm:inline hover:underline hover:text-slate-500 duration-700 transition">
+              Home
+            </li>
           </Link>
 
-          <Link to='/login'>
-          <li className="text-slate-700   hover:underline hover:text-slate-500 duration-700 transition">Login</li>
+          <Link to="/about">
+            <li className="text-slate-700 hidden sm:inline hover:underline hover:text-slate-500 duration-700 transition">
+              About
+            </li>
+          </Link>
+
+          <Link to="/profile">
+            {currentUser ? (
+              <img src={currentUser.avatar} alt="porfile" className="rounded-full h-7 w-7 object-cover " />
+            ) : (
+              <li className="text-slate-700   hover:underline hover:text-slate-500 duration-700 transition">
+                Login
+              </li>
+            )}
           </Link>
         </ul>
       </div>

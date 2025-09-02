@@ -3,6 +3,7 @@ import axios from "axios";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useState } from "react";
+import Oauth from "../components/Oauth";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -111,6 +112,7 @@ const Register = () => {
         >
           {loading ? "Loading..." : "Sign Up"}
         </button>
+        <Oauth />
       </form>
 
       <div className="flex gap-3 mt-5">
