@@ -1,9 +1,15 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} from "../redux/user/user";
 
 const Profile = () => {
   const fileRef = useRef(null);
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   const [file, setFile] = useState(undefined);
   const [fileUrl, setFileUrl] = useState(currentUser?.avatar || "");
@@ -12,6 +18,8 @@ const Profile = () => {
   const [username, setUsername] = useState(currentUser?.username || "");
   const [email, setEmail] = useState(currentUser?.email || "");
   const [password, setPassword] = useState("");
+  const [updateError, setUpdateError] = useState(null);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
 
   // Upload when file changes
   useEffect(() => {
@@ -21,13 +29,14 @@ const Profile = () => {
   }, [file]);
 
   // Upload to Cloudinary
+
   const uploadImage = async (file) => {
-    setUploading(true);
     try {
+      setUploading(true);
       const data = new FormData();
       data.append("file", file);
-      data.append("upload_preset", "image_preset"); // ✅ your preset
-      data.append("folder", "images"); // ✅ your folder
+      data.append("upload_preset", "image_preset");
+      data.append("folder", "images");
 
       const res = await fetch(
         "https://api.cloudinary.com/v1_1/dyxhy8tg5/image/upload",
@@ -38,21 +47,21 @@ const Profile = () => {
       );
 
       const uploadRes = await res.json();
-      console.log("Cloudinary response:", uploadRes);
+      setUploading(false);
 
       if (uploadRes.secure_url) {
-        setFileUrl(uploadRes.secure_url); // update preview
+        setFileUrl(uploadRes.secure_url);
       }
     } catch (err) {
-      console.error("Upload error:", err);
-    } finally {
       setUploading(false);
+      console.error("Upload error:", err);
     }
   };
 
   // Handle update form submit
   const handleUpdate = async (e) => {
     e.preventDefault();
+    dispatch(updateUserStart());
     try {
       const res = await fetch(`http://localhost:3000/user/${currentUser._id}`, {
         method: "PUT",
@@ -62,15 +71,17 @@ const Profile = () => {
         body: JSON.stringify({
           username,
           email,
-          password,
-          avatar: fileUrl, // ✅ send cloudinary url
+          ...(password && { password }),
+          avatar: fileUrl,
         }),
       });
 
       const data = await res.json();
-      console.log("Updated user:", data);
-      alert("Profile updated successfully ✅");
+      dispatch(updateUserSuccess(data));
+      setUpdateSuccess(true);
+      
     } catch (err) {
+      dispatch(updateUserFailure(err.message));
       console.error("Update error:", err);
     }
   };
@@ -122,10 +133,11 @@ const Profile = () => {
           className="border p-3 rounded-lg"
         />
         <button
+          disabled={loading}
           type="submit"
           className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
         >
-          update
+          {loading ? "Loading..." : "Update"}
         </button>
       </form>
 
@@ -133,6 +145,8 @@ const Profile = () => {
         <span className="text-red-700 cursor-pointer">delete Account</span>
         <span className="text-red-700 cursor-pointer">sign out</span>
       </div>
+        {/* <p className="text-red-700 mt-3">{error ? error : ""}</p> */}
+        <p className="text-green-700 mt-4">{updateSuccess ? "User Updated successfully" : ""}</p>
     </div>
   );
 };
