@@ -4,10 +4,15 @@ import {
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  deleteUserFailure,
 } from "../redux/user/user";
+import {useNavigate} from 'react-router-dom'
 
 const Profile = () => {
   const fileRef = useRef(null);
+  const navigate = useNavigate();
   const { currentUser, loading, error } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
@@ -79,10 +84,34 @@ const Profile = () => {
       const data = await res.json();
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
-      
     } catch (err) {
       dispatch(updateUserFailure(err.message));
       console.error("Update error:", err);
+    }
+  };
+
+  // delete user
+  const handleDelete = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(
+        `http://localhost:3000/user/delete/${currentUser._id}`,
+        {
+          method: "DELETE",
+          
+        }
+      );
+
+      const data = await res.json();
+      if(data.success === false){
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+      navigate('/login')
+      
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
     }
   };
 
@@ -142,11 +171,13 @@ const Profile = () => {
       </form>
 
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">delete Account</span>
+        <span className="text-red-700 cursor-pointer" onClick={handleDelete}>delete Account</span>
         <span className="text-red-700 cursor-pointer">sign out</span>
       </div>
-        {/* <p className="text-red-700 mt-3">{error ? error : ""}</p> */}
-        <p className="text-green-700 mt-4">{updateSuccess ? "User Updated successfully" : ""}</p>
+      <p className="text-red-700 mt-3">{error ? error : ""}</p>
+      <p className="text-green-700 mt-4">
+        {updateSuccess ? "User Updated successfully" : ""}
+      </p>
     </div>
   );
 };
