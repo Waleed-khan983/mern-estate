@@ -7,6 +7,7 @@ import {
   deleteUserStart,
   deleteUserSuccess,
   deleteUserFailure,
+  logout,
 } from "../redux/user/user";
 import {useNavigate} from 'react-router-dom'
 
@@ -172,7 +173,7 @@ const Profile = () => {
 
       <div className="flex justify-between mt-5">
         <span className="text-red-700 cursor-pointer" onClick={handleDelete}>delete Account</span>
-        <span className="text-red-700 cursor-pointer">sign out</span>
+        <span className="text-red-700 cursor-pointer" onClick={() => dispatch(logout())}>sign out</span>
       </div>
       <p className="text-red-700 mt-3">{error ? error : ""}</p>
       <p className="text-green-700 mt-4">
