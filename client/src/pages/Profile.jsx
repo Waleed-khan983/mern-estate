@@ -9,7 +9,7 @@ import {
   deleteUserFailure,
   logout,
 } from "../redux/user/user";
-import {useNavigate} from 'react-router-dom'
+import {Link, useNavigate} from 'react-router-dom'
 
 const Profile = () => {
   const fileRef = useRef(null);
@@ -169,6 +169,12 @@ const Profile = () => {
         >
           {loading ? "Loading..." : "Update"}
         </button>
+        <Link to={"/create-listing"}
+           className="bg-green-700 text-white rounded-lg p-3 uppercase text-center hover:opacity-95"
+        >
+            Create Listing
+           
+        </Link>
       </form>
 
       <div className="flex justify-between mt-5">
