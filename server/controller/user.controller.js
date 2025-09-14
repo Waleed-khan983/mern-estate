@@ -1,5 +1,6 @@
 import userModel from "../model/userModel.js";
 import bcrypt from "bcrypt";
+import listingModel from "../model/listing.model.js";
 
 // UPDATE PROFILE
 export const updateProfile = async (req, res) => {
@@ -56,3 +57,27 @@ export const deleteUser = async (req,res ) =>{
     })
   }
 }
+
+export const getUserlistings = async (req, res) => {
+  try {
+    const { id } = req.params;
+   
+
+    const userListings = await listingModel.find({ userRef: id });
+
+    if (!userListings || userListings.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No listings found for this user",
+      });
+    }
+
+    return res.status(200).json({ userListings });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching user listings",
+      error: error.message,
+    });
+  }
+};
