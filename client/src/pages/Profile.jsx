@@ -9,7 +9,8 @@ import {
   deleteUserFailure,
   logout,
 } from "../redux/user/user";
-import {Link, useNavigate} from 'react-router-dom'
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Profile = () => {
   const fileRef = useRef(null);
@@ -24,9 +25,9 @@ const Profile = () => {
   const [username, setUsername] = useState(currentUser?.username || "");
   const [email, setEmail] = useState(currentUser?.email || "");
   const [password, setPassword] = useState("");
-  const [updateError, setUpdateError] = useState(null);
   const [updateSuccess, setUpdateSuccess] = useState(false);
-
+  const [showListingError, setShowListingError] = useState(false);
+  const [userListings, setUserListings] = useState([]);
   // Upload when file changes
   useEffect(() => {
     if (file) {
@@ -99,22 +100,43 @@ const Profile = () => {
         `http://localhost:3000/user/delete/${currentUser._id}`,
         {
           method: "DELETE",
-          
         }
       );
 
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
         return;
       }
       dispatch(deleteUserSuccess(data));
-      navigate('/login')
-      
+      navigate("/login");
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
     }
   };
+
+  const handleShowListing = async () => {
+  try {
+    setShowListingError(false);
+    const res = await axios.get(
+      `http://localhost:3000/user/listings/${currentUser._id}`
+    );
+
+    console.log("Full response:", res.data); // 🔎 log what backend sends
+
+    if (res.data.success === false) {
+      setShowListingError(true);
+      return;
+    }
+
+    setUserListings(res.data.listings);
+    console.log("user listings:", res.data.listings); // 🔎 log parsed listings
+  } catch (error) {
+    console.error("Fetch error:", error); // 🔎 catch block
+    setShowListingError(true);
+  }
+};
+
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -169,22 +191,44 @@ const Profile = () => {
         >
           {loading ? "Loading..." : "Update"}
         </button>
-        <Link to={"/create-listing"}
-           className="bg-green-700 text-white rounded-lg p-3 uppercase text-center hover:opacity-95"
+        <Link
+          to={"/create-listing"}
+          className="bg-green-700 text-white rounded-lg p-3 uppercase text-center hover:opacity-95"
         >
-            Create Listing
-           
+          Create Listing
         </Link>
       </form>
 
-      <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer" onClick={handleDelete}>delete Account</span>
-        <span className="text-red-700 cursor-pointer" onClick={() => dispatch(logout())}>sign out</span>
+      <div className="flex justify-between mt-5 ">
+        <span className="text-red-700 cursor-pointer" onClick={handleDelete}>
+          delete Account
+        </span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={() => dispatch(logout())}
+        >
+          sign out
+        </span>
       </div>
       <p className="text-red-700 mt-3">{error ? error : ""}</p>
       <p className="text-green-700 mt-4">
         {updateSuccess ? "User Updated successfully" : ""}
       </p>
+      <button onClick={handleShowListing} className="text-green-700 w-full  ">
+        Show Listings
+      </button>
+      <p className="text-red-700 mt-5 ">
+        {showListingError ? "Error showing listings " : ""}
+      </p>
+      {userListings &&
+        userListings.length > 0 &&
+        userListings.map((listing) => (
+          <div className="" key={listing._id}>
+            <Link to={`/listing/${listing._id}`}>
+              <img src={listing.imageUrls?.[0]} alt="listing cover" />
+            </Link>
+          </div>
+        ))}
     </div>
   );
 };

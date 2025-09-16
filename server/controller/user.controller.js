@@ -58,10 +58,10 @@ export const deleteUser = async (req,res ) =>{
   }
 }
 
+ 
 export const getUserlistings = async (req, res) => {
   try {
     const { id } = req.params;
-   
 
     const userListings = await listingModel.find({ userRef: id });
 
@@ -72,7 +72,11 @@ export const getUserlistings = async (req, res) => {
       });
     }
 
-    return res.status(200).json({ userListings });
+    // ✅ Always return { success, data }
+    return res.status(200).json({
+      success: true,
+      listings: userListings,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
