@@ -150,6 +150,24 @@ const Profile = () => {
   }
 };
 
+
+const updateListing = async (id, updatedData) => {
+  try {
+    const res = await axios.post(
+      `http://localhost:3000/user/listing/update/${id}`,
+      updatedData
+    );
+
+    if (res.data.success) {
+      alert("Listing updated successfully!");
+      console.log(res.data.listing);
+    }
+  } catch (error) {
+    console.error("Error updating listing:", error.response?.data || error.message);
+    alert("Error updating listing");
+  }
+};
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -263,7 +281,7 @@ const Profile = () => {
                 >
                   delete
                 </button>
-                <button className="text-green-700 uppercase">edit</button>
+                <button onClick={() => updateListing(listing._id, { name: "New Name" })} className="text-green-700 uppercase">edit</button>
               </div>
             </div>
           ))}

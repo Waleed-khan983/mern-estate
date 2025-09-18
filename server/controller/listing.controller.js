@@ -30,7 +30,13 @@ export const deleteListing = async (req, res) => {
         message: "listing not found",
       });
     }
-    await Listing.findByIdAndDelete(id);  // 👈 capital L
+    // if(req.user.id !== listing.userRef){
+    //     return res.status(401).json({
+    //         success: false,
+    //         message: "Your are not authorized to delete this listing",
+    //     })
+    // }
+    await Listing.findByIdAndDelete(id);   
     return res.status(200).json({
       success: true,
       message: "listing deleted successfully",
@@ -43,3 +49,44 @@ export const deleteListing = async (req, res) => {
     });
   }
 };
+
+export const updateListing = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // find if listing exists
+    const listing = await Listing.findById(id);
+    if (!listing) {
+      return res.status(404).json({
+        success: false,
+        message: "Listing not found",
+      });
+    }
+    
+    // if(req.user.id !== listing.userRef){
+    //     return  res.status(401).json({
+    //         success: false,
+    //         message: "You are not authorized to update this listing",
+    //     })
+    // }
+    
+    const updatedListing = await Listing.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new: true} // to return the updated document
+    )
+
+    return res.status(200).json({
+        success: true,
+        message: "Listing updated successfully",
+        listing: updatedListing,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error updating listing",
+      error: error.message,
+    });
+  }
+};
+
