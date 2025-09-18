@@ -137,6 +137,19 @@ const Profile = () => {
     }
   };
 
+  const deletelisting = async (id) => {
+  try {
+    const res = await axios.delete(`http://localhost:3000/user/listing/delete/${id}`);
+    if (res.data.success) {
+      setUserListings((prev) => prev.filter((listing) => listing._id !== id));
+      alert("listing deleted successfully");
+    }
+  } catch (error) {
+    console.error("error deleting listing", error.response?.data || error.message);
+    alert("error deleting listing");
+  }
+};
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -219,10 +232,11 @@ const Profile = () => {
       <p className="text-red-700 mt-5 ">
         {showListingError ? "Error showing listings " : ""}
       </p>
-      {userListings &&
-        userListings.length > 0 &&
+      {userListings && userListings.length > 0 && (
         <div className="flex flex-col gap-4">
-          <h1 className="text-center my-7 text-2xl font-semibold">Your listings</h1>
+          <h1 className="text-center my-7 text-2xl font-semibold">
+            Your listings
+          </h1>
 
           {userListings.map((listing) => (
             <div
@@ -243,14 +257,18 @@ const Profile = () => {
                 <p>{listing.name}</p>
               </Link>
               <div className="flex flex-col items-center">
-                <button className="text-red-700 uppercase">delete</button>
+                <button
+                  onClick={() => deletelisting(listing._id)}
+                  className="text-red-700 uppercase"
+                >
+                  delete
+                </button>
                 <button className="text-green-700 uppercase">edit</button>
               </div>
             </div>
           ))}
         </div>
-}
-      
+      )}
     </div>
   );
 };

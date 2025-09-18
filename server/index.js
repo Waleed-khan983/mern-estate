@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/auth', authrouter)
 app.use('/user', userRouter)
-app.use('/user', listingRouter)
+app.use('/user/listing', listingRouter)
    
  
 
