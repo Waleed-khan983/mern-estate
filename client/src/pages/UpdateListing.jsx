@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const UpdateListing = () => {
   const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+
   const params = useParams();
   const [files, setFiles] = useState([]);
   const [urls, setUrls] = useState([]);
@@ -106,7 +108,8 @@ const UpdateListing = () => {
 
       console.log("Listing created:", res.data);
       setLoading(false);
-      setSuccessMsg("Listing updated successfully!");
+     setSuccessMsg("Listing updated successfully!");
+    navigate(`/listing/${params.id}`);
     } catch (err) {
       setError(
         err.response?.data?.message || err.message || "Something went wrong"
