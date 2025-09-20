@@ -138,35 +138,22 @@ const Profile = () => {
   };
 
   const deletelisting = async (id) => {
-  try {
-    const res = await axios.delete(`http://localhost:3000/user/listing/delete/${id}`);
-    if (res.data.success) {
-      setUserListings((prev) => prev.filter((listing) => listing._id !== id));
-      alert("listing deleted successfully");
+    try {
+      const res = await axios.delete(
+        `http://localhost:3000/user/listing/delete/${id}`
+      );
+      if (res.data.success) {
+        setUserListings((prev) => prev.filter((listing) => listing._id !== id));
+        alert("listing deleted successfully");
+      }
+    } catch (error) {
+      console.error(
+        "error deleting listing",
+        error.response?.data || error.message
+      );
+      alert("error deleting listing");
     }
-  } catch (error) {
-    console.error("error deleting listing", error.response?.data || error.message);
-    alert("error deleting listing");
-  }
-};
-
-
-const updateListing = async (id, updatedData) => {
-  try {
-    const res = await axios.post(
-      `http://localhost:3000/user/listing/update/${id}`,
-      updatedData
-    );
-
-    if (res.data.success) {
-      alert("Listing updated successfully!");
-      console.log(res.data.listing);
-    }
-  } catch (error) {
-    console.error("Error updating listing:", error.response?.data || error.message);
-    alert("Error updating listing");
-  }
-};
+  };
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -281,7 +268,9 @@ const updateListing = async (id, updatedData) => {
                 >
                   delete
                 </button>
-                <button onClick={() => updateListing(listing._id, { name: "New Name" })} className="text-green-700 uppercase">edit</button>
+                <Link to={`/update-listing/${listing._id}`}>
+                  <button className="text-green-700 uppercase">edit</button>
+                </Link>
               </div>
             </div>
           ))}

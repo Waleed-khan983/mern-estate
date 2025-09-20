@@ -90,3 +90,23 @@ export const updateListing = async (req, res) => {
   }
 };
 
+
+export const getListing = async (req,res) =>{
+  try {
+    const {id} = req.params;
+    const listing = await Listing.findById(id);
+    if(!listing){
+      return res.status(404).json({
+        success: false,
+        message: "Listing not found",
+      })
+    }
+    return res.status(200).json(listing);
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    })
+  }
+}
