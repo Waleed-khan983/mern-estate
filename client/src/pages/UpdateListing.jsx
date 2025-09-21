@@ -11,7 +11,7 @@ const UpdateListing = () => {
   const params = useParams();
   const [files, setFiles] = useState([]);
   const [urls, setUrls] = useState([]);
-  const [error, setError] = useState("");  
+  const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -84,8 +84,6 @@ const UpdateListing = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-   
-   
 
     if (urls.length === 0) {
       setError("Please upload at least one image before submitting.");
@@ -95,7 +93,7 @@ const UpdateListing = () => {
     try {
       setLoading(true);
       setError("");
-     setSuccessMsg("");
+      setSuccessMsg("");
 
       const res = await axios.post(
         `http://localhost:3000/user/listing/update/${params.id}`,
@@ -108,8 +106,8 @@ const UpdateListing = () => {
 
       console.log("Listing created:", res.data);
       setLoading(false);
-     setSuccessMsg("Listing updated successfully!");
-    navigate(`/listing/${params.id}`);
+      setSuccessMsg("Listing updated successfully!");
+      navigate(`/listing/${params.id}`);
     } catch (err) {
       setError(
         err.response?.data?.message || err.message || "Something went wrong"
@@ -270,7 +268,9 @@ const UpdateListing = () => {
                 />
                 <div className="flex flex-col items-center">
                   <p>Regular Price</p>
-                  <span className="text-sm">($/Month)</span>
+                  {formData.type === "rent" && (
+                    <span className="text-sm">($/Month)</span>
+                  )}{" "}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -286,7 +286,9 @@ const UpdateListing = () => {
                 />
                 <div className="flex flex-col items-center">
                   <p>Discount Price</p>
-                  <span className="text-sm">($/Month)</span>
+                  {formData.type === "rent" && (
+                    <span className="text-sm">($/Month)</span>
+                  )}{" "}
                 </div>
               </div>
             </div>
