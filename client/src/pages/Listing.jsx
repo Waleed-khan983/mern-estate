@@ -6,14 +6,26 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import SwiperCore from "swiper";
 import { Navigation } from "swiper/modules";
 import "swiper/css/bundle";
-import { FaBath, FaBed, FaChair, FaMapMarkerAlt, FaParking, FaShare } from "react-icons/fa";
+import {
+  FaBath,
+  FaBed,
+  FaChair,
+  FaMapMarkerAlt,
+  FaParking,
+  FaShare,
+} from "react-icons/fa";
+import { useSelector } from "react-redux";
+import Contact from '../components/Contact'
 const Listing = () => {
   SwiperCore.use([Navigation]);
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [contact, setContact] = useState(false);
   const params = useParams();
+  const { currentUser } = useSelector((state) => state.user);
+ 
   useEffect(() => {
     const fetchListing = async () => {
       try {
@@ -28,6 +40,7 @@ const Listing = () => {
         }
 
         setListing(res.data);
+        console.log("Fetched listing:", res.data);
         setLoading(false);
         setError(false);
       } catch (error) {
@@ -37,8 +50,7 @@ const Listing = () => {
     };
     fetchListing();
   }, []);
-  console.log(loading);
-  return (
+   return (
     <main>
       {loading && <p className="text-center my-7 text-2xl">Loading...</p>}
       {error && (
@@ -86,7 +98,7 @@ const Listing = () => {
               {listing.offer
                 ? listing.discountPrice.toLocaleString("en-US").replace()
                 : listing.regularPrice.toLocaleString("en-US")}
-              {(listing.type = "rent" && "/ month")}
+              {listing.type === "rent" && " / month"}
             </p>
             <p className="flex items-center mt-6 gap-2 text-slate-600  text-sm ">
               <FaMapMarkerAlt className="text-green-700 " />
@@ -121,17 +133,22 @@ const Listing = () => {
               </li>
               <li className="flex items-center gap-1 whitespace-nowrap">
                 <FaParking className="text-lg" />
-                 {
-                  listing.parking ? 'Parking' : 'No-Parking'
-                 }
+                {listing.parking ? "Parking" : "No-Parking"}
               </li>
-               <li className="flex items-center gap-1 whitespace-nowrap">
+              <li className="flex items-center gap-1 whitespace-nowrap">
                 <FaChair className="text-lg" />
-                 {
-                  listing.furnished ? 'Furnished' : 'UnFurnished'
-                 }
+                {listing.furnished ? "Furnished" : "UnFurnished"}
               </li>
             </ul>
+            {currentUser && listing.userRef === currentUser._id && !contact && (
+             
+              <button onClick={()=>setContact(true)} className="bg-slate-700 uppercase rounded-lg hover:opacity-95 p-3 text-white">
+                Contact landloard
+              </button>
+            )}
+            {
+              contact && <Contact listing={listing}  />
+            }
           </div>
         </>
       )}
