@@ -18,6 +18,7 @@ const Search = () => {
 
   const [loading, setLoading] = useState(false);
   const [listing, setListing] = useState([]);
+  const [showmore, setShowmore] = useState(false);
   console.log(listing);
 
   useEffect(() => {
@@ -59,6 +60,9 @@ const Search = () => {
         `http://localhost:3000/user/listing/get?${searchQuery}`
       );
       setListing(res.data);
+      if (res.data.length > 8) {
+        setShowmore(true);
+      }
       setLoading(false);
     };
 
@@ -111,6 +115,51 @@ const Search = () => {
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
   };
+
+ useEffect(() => {
+  const urlParams = new URLSearchParams(location.search);
+  const fetchListing = async () => {
+    setLoading(true);
+    const searchQuery = urlParams.toString();
+    const res = await axios.get(
+      `http://localhost:3000/user/listing/get?${searchQuery}`
+    );
+    setListing(res.data);
+
+     if (res.data.length === 8) {
+      setShowmore(true);
+    } else {
+      setShowmore(false);
+    }
+
+    setLoading(false);
+  };
+
+  fetchListing();
+}, [location.search]);
+
+const onShowMoreClick = async () => {
+  const numberOfListings = listing.length;
+  const startIndex = numberOfListings;
+
+  const urlParams = new URLSearchParams(location.search);
+  urlParams.set("startIndex", startIndex);
+  urlParams.set("limit", 8); // ✅ pass same limit as backend
+
+  const searchQuery = urlParams.toString();
+  const res = await fetch(
+    `http://localhost:3000/user/listing/get?${searchQuery}`
+  );
+  const data = await res.json();
+
+  if (data.length < 8) {
+    setShowmore(false);
+  }
+
+  setListing([...listing, ...data]);
+};
+
+
 
   return (
     <div className="flex flex-col md:flex-row ">
@@ -233,6 +282,15 @@ const Search = () => {
             listing.map((listing) => (
               <ListingItem key={listing._id} listing={listing} />
             ))}
+
+          {showmore && (
+            <button
+              onClick={onShowMoreClick}
+              className="text-green-700 hover:underline p-7 text-center w-full"
+            >
+              Show More
+            </button>
+          )}
         </div>
       </div>
     </div>

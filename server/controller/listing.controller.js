@@ -113,7 +113,7 @@ export const getListing = async (req, res) => {
 
 export const getListings = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 9;
+    const limit = parseInt(req.query.limit) || 8; // 🔹 keep consistent with frontend
     const startIndex = parseInt(req.query.startIndex) || 0;
 
     let offer = req.query.offer;
@@ -138,16 +138,13 @@ export const getListings = async (req, res) => {
 
     const searchTerm = req.query.searchTerm || "";
 
-    // ✅ Fix for sort/order
     const sortField =
       req.query.sort && req.query.sort !== "undefined"
         ? req.query.sort
         : "createdAt";
 
     const sortOrder =
-      req.query.order && req.query.order !== "undefined" && req.query.order === "asc"
-        ? 1
-        : -1; // default to descending
+      req.query.order === "asc" ? 1 : -1;
 
     const listings = await Listing.find({
       name: { $regex: searchTerm, $options: "i" },
