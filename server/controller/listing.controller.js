@@ -111,11 +111,11 @@ export const getListing = async (req, res) => {
   }
 };
 
-
 export const getListings = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 9;
     const startIndex = parseInt(req.query.startIndex) || 0;
+
     let offer = req.query.offer;
     if (offer === undefined || offer === "false") {
       offer = { $in: [false, true] };
@@ -137,8 +137,17 @@ export const getListings = async (req, res) => {
     }
 
     const searchTerm = req.query.searchTerm || "";
-    const sort = req.query.sort || "createdAt";
-    const order = req.query.order || "desc";
+
+    // ✅ Fix for sort/order
+    const sortField =
+      req.query.sort && req.query.sort !== "undefined"
+        ? req.query.sort
+        : "createdAt";
+
+    const sortOrder =
+      req.query.order && req.query.order !== "undefined" && req.query.order === "asc"
+        ? 1
+        : -1; // default to descending
 
     const listings = await Listing.find({
       name: { $regex: searchTerm, $options: "i" },
@@ -146,11 +155,14 @@ export const getListings = async (req, res) => {
       furnished,
       parking,
       type,
-    }).sort({
-      [sort]: order,
-    }).limit(limit).skip(startIndex);
-    return res.status(200).json(listings)
+    })
+      .sort({ [sortField]: sortOrder })
+      .limit(limit)
+      .skip(startIndex);
+
+    return res.status(200).json(listings);
   } catch (error) {
+    console.error("Error in getListings:", error.message);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
