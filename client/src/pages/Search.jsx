@@ -11,7 +11,6 @@ const Search = () => {
     parking: false,
     furnished: false,
     offer: false,
-    // 🔹 FIXED: use createdAt instead of created_at
     sort: "createdAt",
     order: "desc",
   });
@@ -78,7 +77,6 @@ const Search = () => {
       setSidebardata({ ...sidebardata, type: e.target.id });
     }
     if (e.target.id === "searchTerm") {
-      // 🔹 FIXED: spread sidebardata, not setSidebardata
       setSidebardata({ ...sidebardata, searchTerm: e.target.value });
     }
     if (
@@ -116,50 +114,48 @@ const Search = () => {
     navigate(`/search?${searchQuery}`);
   };
 
- useEffect(() => {
-  const urlParams = new URLSearchParams(location.search);
-  const fetchListing = async () => {
-    setLoading(true);
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const fetchListing = async () => {
+      setLoading(true);
+      const searchQuery = urlParams.toString();
+      const res = await axios.get(
+        `http://localhost:3000/user/listing/get?${searchQuery}`
+      );
+      setListing(res.data);
+
+      if (res.data.length === 8) {
+        setShowmore(true);
+      } else {
+        setShowmore(false);
+      }
+
+      setLoading(false);
+    };
+
+    fetchListing();
+  }, [location.search]);
+
+  const onShowMoreClick = async () => {
+    const numberOfListings = listing.length;
+    const startIndex = numberOfListings;
+
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("startIndex", startIndex);
+    urlParams.set("limit", 8); // ✅ pass same limit as backend
+
     const searchQuery = urlParams.toString();
-    const res = await axios.get(
+    const res = await fetch(
       `http://localhost:3000/user/listing/get?${searchQuery}`
     );
-    setListing(res.data);
+    const data = await res.json();
 
-     if (res.data.length === 8) {
-      setShowmore(true);
-    } else {
+    if (data.length < 8) {
       setShowmore(false);
     }
 
-    setLoading(false);
+    setListing([...listing, ...data]);
   };
-
-  fetchListing();
-}, [location.search]);
-
-const onShowMoreClick = async () => {
-  const numberOfListings = listing.length;
-  const startIndex = numberOfListings;
-
-  const urlParams = new URLSearchParams(location.search);
-  urlParams.set("startIndex", startIndex);
-  urlParams.set("limit", 8); // ✅ pass same limit as backend
-
-  const searchQuery = urlParams.toString();
-  const res = await fetch(
-    `http://localhost:3000/user/listing/get?${searchQuery}`
-  );
-  const data = await res.json();
-
-  if (data.length < 8) {
-    setShowmore(false);
-  }
-
-  setListing([...listing, ...data]);
-};
-
-
 
   return (
     <div className="flex flex-col md:flex-row ">

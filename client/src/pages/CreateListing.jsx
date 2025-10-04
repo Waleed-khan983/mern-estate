@@ -311,8 +311,7 @@ const CreateListing = () => {
             {loading ? "Creating..." : "Create Listing"}
           </button>
 
-          {/*  fixed error display */}
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+           {error && <p className="text-red-500 text-sm">{error}</p>}
         </div>
       </form>
     </main>
